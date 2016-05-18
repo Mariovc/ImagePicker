@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ImagePicker</string>
+    <string name="pick_image_message">Click on the image to pick a new image:</string>
 </resources>

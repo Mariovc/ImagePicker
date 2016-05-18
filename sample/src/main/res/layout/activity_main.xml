@@ -12,13 +12,14 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:text="@string/pick_image_message"
+        android:layout_centerHorizontal="true" />
 
     <ImageView
         android:id="@+id/image_view"
         android:layout_width="300dp"
         android:layout_height="300dp"
-        android:src="@android:drawable/ic_dialog_dialer"
+        android:src="@android:drawable/ic_menu_gallery"
         android:layout_centerInParent="true"
         android:onClick="onPickImage"/>
 </RelativeLayout>

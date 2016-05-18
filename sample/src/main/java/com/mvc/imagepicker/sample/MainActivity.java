@@ -11,12 +11,13 @@ import com.mvc.imagepicker.ImagePicker;
 
 public class MainActivity extends AppCompatActivity {
 
-
     private ImageView imageView;
 
-
-    public void onPickImage(View view) {
-        ImagePicker.pickImage(this);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        imageView = (ImageView) findViewById(R.id.image_view);
     }
 
     @Override
@@ -25,10 +26,7 @@ public class MainActivity extends AppCompatActivity {
         imageView.setImageBitmap(bitmap);
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        imageView = (ImageView) findViewById(R.id.image_view);
+    public void onPickImage(View view) {
+        ImagePicker.pickImage(this);
     }
 }
