@@ -18,15 +18,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         imageView = (ImageView) findViewById(R.id.image_view);
+        // width and height will be at least 600px long (optional).
+        ImagePicker.setMinQuality(600, 600);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Bitmap bitmap = ImagePicker.getImageFromResult(this, requestCode, resultCode, data);
-        imageView.setImageBitmap(bitmap);
+        if (bitmap != null) {
+            imageView.setImageBitmap(bitmap);
+        }
     }
 
     public void onPickImage(View view) {
-        ImagePicker.pickImage(this);
+        ImagePicker.pickImage(this, "Select your image:");
     }
 }
