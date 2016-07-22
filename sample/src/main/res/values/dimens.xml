@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="activity_default_margin">16dp</dimen>
+    <dimen name="activity_default_padding">8dp</dimen>
+    <dimen name="picker_text_margin">8dp</dimen>
 </resources>
