@@ -39,27 +39,29 @@ Add the following code to your *Activity*:
 Add it to your project
 ----------------------
 
+Add this permission to your ``AndroidManifest``:
+
+```xml
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+```
+
 Add it in your *root* ``build.gradle`` at the end of repositories:
 
 ```groovy
-
 allprojects {
   repositories {
     ...
     maven { url "https://jitpack.io" }
   }
 }
-
 ```
 
 Add ``ImagePicker`` dependency to your *app* ``build.gradle`` file:
 
 ```groovy
-
 dependencies{
-    compile 'com.github.Mariovc:ImagePicker:0.8.0'
+    compile 'com.github.Mariovc:ImagePicker:1.0.0'
 }
-
 ```
 
 
@@ -74,11 +76,11 @@ Developed By
 
 * Mario Velasco Casquero - <m3ario@gmail.com>
 
-<a href="https://es.linkedin.com/in/mariovc">
-  <img alt="Add me to Linkedin" src="./art/linkedin.png" />
-</a>
 <a href="https://twitter.com/MVelascoC">
   <img alt="Follow me on Twitter" src="./art/twitter.png" />
+</a>
+<a href="https://es.linkedin.com/in/mariovc">
+  <img alt="Add me to Linkedin" src="./art/linkedin.png" />
 </a>
 
 
