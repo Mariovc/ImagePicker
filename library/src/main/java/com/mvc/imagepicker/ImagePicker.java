@@ -38,7 +38,7 @@ import java.util.List;
  * Date: 08/09/2015
  * Email: m3ario@gmail.com
  */
-public class ImagePicker {
+public final class ImagePicker {
 
     private static final int PICK_IMAGE_ID = 234; // the number doesn't matter
     private static final int DEFAULT_MIN_WIDTH_QUALITY = 400;        // min pixels
@@ -46,13 +46,17 @@ public class ImagePicker {
     private static final String TAG = ImagePicker.class.getSimpleName();
     private static final String TEMP_IMAGE_NAME = "tempImage";
 
-    public static int minWidthQuality = DEFAULT_MIN_WIDTH_QUALITY;
-    public static int minHeightQuality = DEFAULT_MIN_HEIGHT_QUALITY;
+    private static int minWidthQuality = DEFAULT_MIN_WIDTH_QUALITY;
+    private static int minHeightQuality = DEFAULT_MIN_HEIGHT_QUALITY;
+
+    private ImagePicker() {
+        // not called
+    }
 
     /**
      * Launch a dialog to pick an image from camera/gallery apps.
      *
-     * @param activity  which will launch the dialog.
+     * @param activity which will launch the dialog.
      */
     public static void pickImage(Activity activity) {
         String chooserTitle = activity.getString(R.string.pick_image_intent_text);
@@ -62,8 +66,8 @@ public class ImagePicker {
     /**
      * Launch a dialog to pick an image from camera/gallery apps.
      *
-     * @param activity      which will launch the dialog.
-     * @param chooserTitle  will appear on the picker dialog.
+     * @param activity     which will launch the dialog.
+     * @param chooserTitle will appear on the picker dialog.
      */
     public static void pickImage(Activity activity, String chooserTitle) {
         Intent chooseImageIntent = getPickImageIntent(activity, chooserTitle);
@@ -73,9 +77,9 @@ public class ImagePicker {
     /**
      * Get an Intent which will launch a dialog to pick an image from camera/gallery apps.
      *
-     * @param context       context.
-     * @param chooserTitle  will appear on the picker dialog.
-     * @return              intent launcher.
+     * @param context      context.
+     * @param chooserTitle will appear on the picker dialog.
+     * @return intent launcher.
      */
     public static Intent getPickImageIntent(Context context, String chooserTitle) {
         Intent chooserIntent = null;
@@ -116,11 +120,11 @@ public class ImagePicker {
      * Called after launching the picker with the same values of Activity.getImageFromResult
      * in order to resolve the result and get the image.
      *
-     * @param context               context.
-     * @param requestCode           used to identify the pick image action.
-     * @param resultCode            -1 means the result is OK.
-     * @param imageReturnedIntent   returned intent where is the image data.
-     * @return                      image.
+     * @param context             context.
+     * @param requestCode         used to identify the pick image action.
+     * @param resultCode          -1 means the result is OK.
+     * @param imageReturnedIntent returned intent where is the image data.
+     * @return image.
      */
     public static Bitmap getImageFromResult(Context context, int requestCode, int resultCode,
                                             Intent imageReturnedIntent) {
@@ -129,9 +133,9 @@ public class ImagePicker {
         if (resultCode == Activity.RESULT_OK && requestCode == PICK_IMAGE_ID) {
             File imageFile = getTemporalFile(context);
             Uri selectedImage;
-            boolean isCamera = (imageReturnedIntent == null ||
-                    imageReturnedIntent.getData() == null ||
-                    imageReturnedIntent.getData().toString().contains(imageFile.toString()));
+            boolean isCamera = (imageReturnedIntent == null
+                    || imageReturnedIntent.getData() == null
+                    || imageReturnedIntent.getData().toString().contains(imageFile.toString()));
             if (isCamera) {     /** CAMERA **/
                 selectedImage = Uri.fromFile(imageFile);
             } else {            /** ALBUM **/
@@ -161,9 +165,9 @@ public class ImagePicker {
         do {
             bm = decodeBitmap(context, selectedImage, sampleSizes[i]);
             i++;
-        } while (bm != null &&
-                (bm.getWidth() < minWidthQuality || bm.getHeight() < minHeightQuality) &&
-                i < sampleSizes.length);
+        } while (bm != null
+                && (bm.getWidth() < minWidthQuality || bm.getHeight() < minHeightQuality)
+                && i < sampleSizes.length);
         Log.i(TAG, "Final bitmap width = " + (bm != null ? bm.getWidth() : "No final bitmap"));
         return bm;
     }
@@ -183,8 +187,9 @@ public class ImagePicker {
         if (fileDescriptor != null) {
             actuallyUsableBitmap = BitmapFactory
                     .decodeFileDescriptor(fileDescriptor.getFileDescriptor(), null, options);
-            Log.i(TAG, "Trying sample size " + options.inSampleSize + "\t\tBitmap width: " +
-            actuallyUsableBitmap.getWidth() + "\theight: " + actuallyUsableBitmap.getHeight());
+            Log.i(TAG, "Trying sample size " + options.inSampleSize + "\t\t"
+                    + "Bitmap width: " + actuallyUsableBitmap.getWidth()
+                    + "\theight: " + actuallyUsableBitmap.getHeight());
         }
 
         return actuallyUsableBitmap;

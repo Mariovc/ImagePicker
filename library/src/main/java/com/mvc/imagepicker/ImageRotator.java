@@ -29,19 +29,23 @@ import android.util.Log;
  * Author: Mario Velasco Casquero
  * Date: 21/07/2016
  */
-public class ImageRotator {
-
+public final class ImageRotator {
 
     private static final String TAG = ImageRotator.class.getSimpleName();
+
+
+    private ImageRotator() {
+        // not called
+    }
 
     /**
      * Get rotation degrees of the selected image. E.g.: 0º, 90º, 180º, 240º.
      *
-     * @param context       context.
-     * @param imageUri      URI of image which will be analyzed.
-     * @param fromCamera    true if the image was taken from camera,
-     *                      false if it was selected from the gallery.
-     * @return              degrees of rotation.
+     * @param context    context.
+     * @param imageUri   URI of image which will be analyzed.
+     * @param fromCamera true if the image was taken from camera,
+     *                   false if it was selected from the gallery.
+     * @return degrees of rotation.
      */
     public static int getRotation(Context context, Uri imageUri, boolean fromCamera) {
         int rotation;
@@ -73,6 +77,9 @@ public class ImageRotator {
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_90:
                     rotate = 90;
+                    break;
+                default:
+                    rotate = 0;
                     break;
             }
         } catch (Exception e) {
