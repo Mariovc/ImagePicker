@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016 Mario Velasco Casquero
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.mvc.imagepicker;
 
 import android.content.Context;
@@ -13,19 +29,23 @@ import android.util.Log;
  * Author: Mario Velasco Casquero
  * Date: 21/07/2016
  */
-public class ImageRotator {
-
+public final class ImageRotator {
 
     private static final String TAG = ImageRotator.class.getSimpleName();
+
+
+    private ImageRotator() {
+        // not called
+    }
 
     /**
      * Get rotation degrees of the selected image. E.g.: 0º, 90º, 180º, 240º.
      *
-     * @param context       context.
-     * @param imageUri      URI of image which will be analyzed.
-     * @param fromCamera    true if the image was taken from camera,
-     *                      false if it was selected from the gallery.
-     * @return              degrees of rotation.
+     * @param context    context.
+     * @param imageUri   URI of image which will be analyzed.
+     * @param fromCamera true if the image was taken from camera,
+     *                   false if it was selected from the gallery.
+     * @return degrees of rotation.
      */
     public static int getRotation(Context context, Uri imageUri, boolean fromCamera) {
         int rotation;
@@ -57,6 +77,9 @@ public class ImageRotator {
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_90:
                     rotate = 90;
+                    break;
+                default:
+                    rotate = 0;
                     break;
             }
         } catch (Exception e) {
