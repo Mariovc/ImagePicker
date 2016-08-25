@@ -40,6 +40,18 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    def date = new Date().format("yyyy-MM-dd___(HH.mm.ss)")
+                    def newName = output.outputFile.name
+                    newName = newName.replace("sample", config.app_name)
+                    newName = newName.replace("release", String.format("v%d(%s)___%s",
+                            defaultConfig.versionCode, defaultConfig.versionName, date))
+
+                    def outputFile = String.format("apk/%s", newName)
+                    output.outputFile = new File(output.outputFile.parent, outputFile)
+                }
+            }
         }
     }
 }

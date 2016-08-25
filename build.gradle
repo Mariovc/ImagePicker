@@ -18,12 +18,13 @@
 
 ext {
     configuration = [
+            app_name            : "ImagePicker",
             compileVersion      : 24,
             buildToolsVersion   : "23.0.3",
             minSdk              : 15,
             targetSdk           : 24,
-            version_code        : 3,
-            version_name        : "1.0.1"
+            version_code        : 4,
+            version_name        : "1.0.2"
     ]
 
     libraries = [
