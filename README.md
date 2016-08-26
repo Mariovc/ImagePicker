@@ -1,13 +1,18 @@
 ImagePicker
 ==================
 
-ImagePicker is an Android library to easily pick an image from gallery or camera app. The users can select their prefered gallery/camera app on a unique Intent.
+ImagePicker is an Android library to easily pick an image from gallery or camera app. The users can select their prefered gallery/camera app on a unique Intent. 
+Download the APK sample on Google Play:
+
+<a href="https://play.google.com/store/apps/details?id=com.mvc.imagepicker">
+  <img alt="Add me to Linkedin" src="./art/GooglePlay.png" />
+</a>
 
 
 Screenshots
 -----------
 
-![Sample screenshot][1]
+![Sample screenshot][2]
 
 
 Usage
@@ -60,7 +65,7 @@ Add ``ImagePicker`` dependency to your *app* ``build.gradle`` file:
 
 ```groovy
 dependencies{
-    compile 'com.github.Mariovc:ImagePicker:1.0.0'
+    compile 'com.github.Mariovc:ImagePicker:1.0.2'
 }
 ```
 
@@ -83,7 +88,6 @@ Developed By
   <img alt="Add me to Linkedin" src="./art/linkedin.png" />
 </a>
 
-
 License
 -------
 
@@ -101,6 +105,5 @@ License
     See the License for the specific language governing permissions and
     limitations under the License.
 
-[1]: ./art/ImagePickerSample.gif
-[2]: ./art/linkedin.png
-[3]: ./art/twitter.png
+[1]: ./art/GooglePlay.png
+[2]: ./art/ImagePickerSample.gif
