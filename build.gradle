@@ -19,6 +19,7 @@
 ext {
     configuration = [
             app_name            : "ImagePicker",
+            packageName         : "com.mvc.imagepicker",
             compileVersion      : 24,
             buildToolsVersion   : "23.0.3",
             minSdk              : 15,
@@ -38,6 +39,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.2'
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.4.4"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
