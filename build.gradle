@@ -19,6 +19,7 @@
 ext {
     configuration = [
             app_name            : "ImagePicker",
+            packageName         : "com.mvc.imagepicker",
             compileVersion      : 24,
             buildToolsVersion   : "23.0.3",
             minSdk              : 15,
