@@ -29,7 +29,7 @@ android {
     buildToolsVersion config.buildToolsVersion
 
     defaultConfig {
-        applicationId "com.mvc.imagepicker"
+        applicationId config.packageName
         minSdkVersion config.minSdk
         targetSdkVersion config.targetSdk
         versionCode config.version_code
@@ -44,7 +44,7 @@ android {
                 variant.outputs.each { output ->
                     def date = new Date().format("yyyy-MM-dd___(HH.mm.ss)")
                     def newName = output.outputFile.name
-                    newName = newName.replace("sample", config.app_name)
+                    newName = newName.replace(project.getName(), config.app_name)
                     newName = newName.replace("release", String.format("v%d(%s)___%s",
                             defaultConfig.versionCode, defaultConfig.versionName, date))
 

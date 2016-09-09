@@ -1,5 +1,12 @@
 ImagePicker
-==================
+===========
+
+<a href="https://android-arsenal.com/api?level=14">
+  <img alt="Min API" src="https://img.shields.io/badge/API-14%2B-orange.svg?style=flat" />
+</a>
+<a href="https://github.com/Mariovc/ImagePicker/releases/latest">
+  <img alt="Latest release" src="https://img.shields.io/github/release/Mariovc/ImagePicker.svg" />
+</a>
 
 ImagePicker is an Android library to easily pick an image from gallery or camera app. The users can select their prefered gallery/camera app on a unique Intent. 
 Download the APK sample on Google Play:
@@ -55,7 +62,7 @@ Add it in your *root* ``build.gradle`` at the end of repositories:
 ```groovy
 allprojects {
   repositories {
-    ...
+    // Add this line
     maven { url "https://jitpack.io" }
   }
 }
@@ -65,9 +72,11 @@ Add ``ImagePicker`` dependency to your *app* ``build.gradle`` file:
 
 ```groovy
 dependencies{
-    compile 'com.github.Mariovc:ImagePicker:1.0.2'
+    compile 'com.github.Mariovc:ImagePicker:x.x.x'
 }
 ```
+
+where `x.x.x` corresponds to latest release version published in [ ![release](https://img.shields.io/github/release/Mariovc/ImagePicker.svg) ](https://github.com/Mariovc/ImagePicker/releases/latest)
 
 
 Contributing
