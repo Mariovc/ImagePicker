@@ -26,6 +26,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import java.io.File;
@@ -66,12 +67,35 @@ public final class ImagePicker {
     /**
      * Launch a dialog to pick an image from camera/gallery apps.
      *
+     * @param fragment which will launch the dialog and will get the result in
+     *                 onActivityResult()
+     */
+    public static void pickImage(Fragment fragment) {
+        String chooserTitle = fragment.getString(R.string.pick_image_intent_text);
+        pickImage(fragment, chooserTitle);
+    }
+
+    /**
+     * Launch a dialog to pick an image from camera/gallery apps.
+     *
      * @param activity     which will launch the dialog.
      * @param chooserTitle will appear on the picker dialog.
      */
     public static void pickImage(Activity activity, String chooserTitle) {
         Intent chooseImageIntent = getPickImageIntent(activity, chooserTitle);
         activity.startActivityForResult(chooseImageIntent, PICK_IMAGE_ID);
+    }
+
+    /**
+     * Launch a dialog to pick an image from camera/gallery apps.
+     *
+     * @param fragment     which will launch the dialog and will get the result in
+     *                     onActivityResult()
+     * @param chooserTitle will appear on the picker dialog.
+     */
+    public static void pickImage(Fragment fragment, String chooserTitle) {
+        Intent chooseImageIntent = getPickImageIntent(fragment.getContext(), chooserTitle);
+        fragment.startActivityForResult(chooseImageIntent, PICK_IMAGE_ID);
     }
 
     /**
@@ -149,7 +173,6 @@ public final class ImagePicker {
         }
         return bm;
     }
-
 
     private static File getTemporalFile(Context context) {
         return new File(context.getExternalCacheDir(), TEMP_IMAGE_NAME);
