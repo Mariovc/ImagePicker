@@ -41,7 +41,7 @@ import java.util.List;
  */
 public final class ImagePicker {
 
-    private static final int PICK_IMAGE_ID = 234; // the number doesn't matter
+    public static final int PICK_IMAGE_REQUEST_CODE = 234; // the number doesn't matter
     private static final int DEFAULT_MIN_WIDTH_QUALITY = 400;        // min pixels
     private static final int DEFAULT_MIN_HEIGHT_QUALITY = 400;        // min pixels
     private static final String TAG = ImagePicker.class.getSimpleName();
@@ -83,7 +83,7 @@ public final class ImagePicker {
      */
     public static void pickImage(Activity activity, String chooserTitle) {
         Intent chooseImageIntent = getPickImageIntent(activity, chooserTitle);
-        activity.startActivityForResult(chooseImageIntent, PICK_IMAGE_ID);
+        activity.startActivityForResult(chooseImageIntent, PICK_IMAGE_REQUEST_CODE);
     }
 
     /**
@@ -95,7 +95,7 @@ public final class ImagePicker {
      */
     public static void pickImage(Fragment fragment, String chooserTitle) {
         Intent chooseImageIntent = getPickImageIntent(fragment.getContext(), chooserTitle);
-        fragment.startActivityForResult(chooseImageIntent, PICK_IMAGE_ID);
+        fragment.startActivityForResult(chooseImageIntent, PICK_IMAGE_REQUEST_CODE);
     }
 
     /**
@@ -154,7 +154,7 @@ public final class ImagePicker {
                                             Intent imageReturnedIntent) {
         Log.i(TAG, "getImageFromResult() called with: " + "resultCode = [" + resultCode + "]");
         Bitmap bm = null;
-        if (resultCode == Activity.RESULT_OK && requestCode == PICK_IMAGE_ID) {
+        if (resultCode == Activity.RESULT_OK && requestCode == PICK_IMAGE_REQUEST_CODE) {
             File imageFile = getTemporalFile(context);
             Uri selectedImage;
             boolean isCamera = (imageReturnedIntent == null
