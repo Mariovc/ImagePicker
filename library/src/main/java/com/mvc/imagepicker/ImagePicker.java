@@ -26,6 +26,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import java.io.File;
@@ -40,7 +41,7 @@ import java.util.List;
  */
 public final class ImagePicker {
 
-    private static final int PICK_IMAGE_ID = 234; // the number doesn't matter
+    public static final int PICK_IMAGE_REQUEST_CODE = 234; // the number doesn't matter
     private static final int DEFAULT_MIN_WIDTH_QUALITY = 400;        // min pixels
     private static final int DEFAULT_MIN_HEIGHT_QUALITY = 400;        // min pixels
     private static final String TAG = ImagePicker.class.getSimpleName();
@@ -66,12 +67,35 @@ public final class ImagePicker {
     /**
      * Launch a dialog to pick an image from camera/gallery apps.
      *
+     * @param fragment which will launch the dialog and will get the result in
+     *                 onActivityResult()
+     */
+    public static void pickImage(Fragment fragment) {
+        String chooserTitle = fragment.getString(R.string.pick_image_intent_text);
+        pickImage(fragment, chooserTitle);
+    }
+
+    /**
+     * Launch a dialog to pick an image from camera/gallery apps.
+     *
      * @param activity     which will launch the dialog.
      * @param chooserTitle will appear on the picker dialog.
      */
     public static void pickImage(Activity activity, String chooserTitle) {
         Intent chooseImageIntent = getPickImageIntent(activity, chooserTitle);
-        activity.startActivityForResult(chooseImageIntent, PICK_IMAGE_ID);
+        activity.startActivityForResult(chooseImageIntent, PICK_IMAGE_REQUEST_CODE);
+    }
+
+    /**
+     * Launch a dialog to pick an image from camera/gallery apps.
+     *
+     * @param fragment     which will launch the dialog and will get the result in
+     *                     onActivityResult()
+     * @param chooserTitle will appear on the picker dialog.
+     */
+    public static void pickImage(Fragment fragment, String chooserTitle) {
+        Intent chooseImageIntent = getPickImageIntent(fragment.getContext(), chooserTitle);
+        fragment.startActivityForResult(chooseImageIntent, PICK_IMAGE_REQUEST_CODE);
     }
 
     /**
@@ -130,7 +154,7 @@ public final class ImagePicker {
                                             Intent imageReturnedIntent) {
         Log.i(TAG, "getImageFromResult() called with: " + "resultCode = [" + resultCode + "]");
         Bitmap bm = null;
-        if (resultCode == Activity.RESULT_OK && requestCode == PICK_IMAGE_ID) {
+        if (resultCode == Activity.RESULT_OK && requestCode == PICK_IMAGE_REQUEST_CODE) {
             File imageFile = getTemporalFile(context);
             Uri selectedImage;
             boolean isCamera = (imageReturnedIntent == null
@@ -149,7 +173,6 @@ public final class ImagePicker {
         }
         return bm;
     }
-
 
     private static File getTemporalFile(Context context) {
         return new File(context.getExternalCacheDir(), TEMP_IMAGE_NAME);
