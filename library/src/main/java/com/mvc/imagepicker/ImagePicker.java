@@ -16,9 +16,11 @@
 
 package com.mvc.imagepicker;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
@@ -27,6 +29,7 @@ import android.net.Uri;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import java.io.File;
@@ -111,11 +114,15 @@ public final class ImagePicker {
 
         Intent pickIntent = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        takePhotoIntent.putExtra("return-data", true);
-        takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(getTemporalFile(context)));
         intentList = addIntentsToList(context, intentList, pickIntent);
-        intentList = addIntentsToList(context, intentList, takePhotoIntent);
+
+        // Camera action will fail if the app does not have permission, check before adding intent.
+        if (hasCameraAccess(context)) {
+            Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            takePhotoIntent.putExtra("return-data", true);
+            takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(getTemporalFile(context)));
+            intentList = addIntentsToList(context, intentList, takePhotoIntent);
+        }
 
         if (intentList.size() > 0) {
             chooserIntent = Intent.createChooser(intentList.remove(intentList.size() - 1),
@@ -138,6 +145,15 @@ public final class ImagePicker {
             Log.i(TAG, "App package: " + packageName);
         }
         return list;
+    }
+
+    /**
+     * Checks if the current context has permission to access the camera.
+     * @param context             context.
+     */
+    private static boolean hasCameraAccess(Context context) {
+        return ContextCompat.checkSelfPermission(context,
+                Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
 
     /**
