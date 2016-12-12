@@ -24,8 +24,8 @@ ext {
             buildToolsVersion   : "23.0.3",
             minSdk              : 15,
             targetSdk           : 24,
-            version_code        : 4,
-            version_name        : "1.0.2"
+            version_code        : 7,
+            version_name        : "1.0.7"
     ]
 
     libraries = [
@@ -38,8 +38,8 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.2'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.4.4"
+        classpath 'com.android.tools.build:gradle:2.2.2'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
