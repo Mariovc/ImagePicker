@@ -34,6 +34,7 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -219,16 +220,16 @@ public final class ImagePicker {
 
         try {
             fileDescriptor = context.getContentResolver().openAssetFileDescriptor(theUri, "r");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        if (fileDescriptor != null) {
             actuallyUsableBitmap = BitmapFactory
                     .decodeFileDescriptor(fileDescriptor.getFileDescriptor(), null, options);
             Log.i(TAG, "Trying sample size " + options.inSampleSize + "\t\t"
                     + "Bitmap width: " + actuallyUsableBitmap.getWidth()
                     + "\theight: " + actuallyUsableBitmap.getHeight());
+            fileDescriptor.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         return actuallyUsableBitmap;
