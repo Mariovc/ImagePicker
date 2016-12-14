@@ -20,6 +20,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.AssetFileDescriptor;
@@ -36,6 +37,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -118,7 +120,11 @@ public final class ImagePicker {
         intentList = addIntentsToList(context, intentList, pickIntent);
 
         // Camera action will fail if the app does not have permission, check before adding intent.
-        if (hasCameraAccess(context)) {
+        // We only need to add the camera intent if the app does not use the CAMERA permission
+        // in the androidmanifest.xml
+        // Or if the user has granted access to the camera.
+        // See https://developer.android.com/reference/android/provider/MediaStore.html#ACTION_IMAGE_CAPTURE
+        if (!appManifestContainsPermission(context, Manifest.permission.CAMERA) || hasCameraAccess(context)) {
             Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             takePhotoIntent.putExtra("return-data", true);
             takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(getTemporalFile(context)));
@@ -155,6 +161,33 @@ public final class ImagePicker {
     private static boolean hasCameraAccess(Context context) {
         return ContextCompat.checkSelfPermission(context,
                 Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    /**
+     * Checks if the androidmanifest.xml contains the given permission.
+     * @param context             context.
+     * @return Boolean, indicating if the permission is present.
+     */
+    private static boolean appManifestContainsPermission(Context context, String permission) {
+        PackageManager pm = context.getPackageManager();
+        try {
+            PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(), PackageManager.GET_PERMISSIONS);
+            String[] requestedPermissions = null;
+            if (packageInfo != null) {
+                requestedPermissions = packageInfo.requestedPermissions;
+            }
+            if (requestedPermissions == null) {
+                return false;
+            }
+
+            if (requestedPermissions.length > 0) {
+                List<String> requestedPermissionsList = Arrays.asList(requestedPermissions);
+                return requestedPermissionsList.contains(permission);
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
