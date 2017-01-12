@@ -255,7 +255,7 @@ public final class ImagePicker {
             fileDescriptor = context.getContentResolver().openAssetFileDescriptor(theUri, "r");
             actuallyUsableBitmap = BitmapFactory
                     .decodeFileDescriptor(fileDescriptor.getFileDescriptor(), null, options);
-            if(actuallyUsableBitmap != null) {
+            if (actuallyUsableBitmap != null) {
                 Log.i(TAG, "Trying sample size " + options.inSampleSize + "\t\t"
                         + "Bitmap width: " + actuallyUsableBitmap.getWidth()
                         + "\theight: " + actuallyUsableBitmap.getHeight());
