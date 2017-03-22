@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         if (bitmap != null) {
             imageView.setImageBitmap(bitmap);
         }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     public void onPickImage(View view) {
