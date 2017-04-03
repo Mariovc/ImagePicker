@@ -34,8 +34,10 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -222,6 +224,48 @@ public final class ImagePicker {
             bm = ImageRotator.rotate(bm, rotation);
         }
         return bm;
+    }
+
+    /**
+     * Called after launching the picker with the same values of Activity.getImageFromResult
+     * in order to resolve the result and get the input stream for the image.
+     *
+     * @param context             context.
+     * @param requestCode         used to identify the pick image action.
+     * @param resultCode          -1 means the result is OK.
+     * @param imageReturnedIntent returned intent where is the image data.
+     * @return stream.
+     */
+    public static InputStream getInputStreamFromResult(Context context, int requestCode, int resultCode,
+                                                       Intent imageReturnedIntent) {
+        Log.i(TAG, "getFileFromResult() called with: " + "resultCode = [" + resultCode + "]");
+        if (resultCode == Activity.RESULT_OK && requestCode == PICK_IMAGE_REQUEST_CODE) {
+            File imageFile = getTemporalFile(context);
+            Uri selectedImage;
+            boolean isCamera = (imageReturnedIntent == null
+                || imageReturnedIntent.getData() == null
+                || imageReturnedIntent.getData().toString().contains(imageFile.toString()));
+            if (isCamera) {     /** CAMERA **/
+                selectedImage = Uri.fromFile(imageFile);
+            } else {            /** ALBUM **/
+                selectedImage = imageReturnedIntent.getData();
+            }
+            Log.i(TAG, "selectedImage: " + selectedImage);
+
+            try {
+                if (isCamera) {
+                    // We can just open the temporary file stream and return it
+                    return new FileInputStream(imageFile);
+                } else {
+                    // Otherwise use the ContentResolver
+                    return context.getContentResolver().openInputStream(selectedImage);
+                }
+            } catch (FileNotFoundException ex) {
+                Log.e(TAG, "Could not open input stream for: " + selectedImage);
+                return null;
+            }
+        }
+        return null;
     }
 
     private static File getTemporalFile(Context context) {
