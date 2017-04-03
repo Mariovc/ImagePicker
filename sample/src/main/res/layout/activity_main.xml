@@ -37,4 +37,10 @@
         android:src="@android:drawable/ic_menu_gallery"
         android:layout_weight="1"
         android:onClick="onPickImage"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/image_stream_indicator"
+        android:text="[status]"/>
 </LinearLayout>
