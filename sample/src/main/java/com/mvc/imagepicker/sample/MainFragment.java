@@ -25,8 +25,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.mvc.imagepicker.ImagePicker;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Author: Mario Velasco Casquero
@@ -36,6 +40,7 @@ import com.mvc.imagepicker.ImagePicker;
 public class MainFragment extends Fragment {
 
     private ImageView imageView;
+    private TextView textView;
 
 
     @Override
@@ -49,6 +54,7 @@ public class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_main, container, false);
         imageView = (ImageView) v.findViewById(R.id.image_view);
+        textView = (TextView) v.findViewById(R.id.image_stream_indicator);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,6 +69,17 @@ public class MainFragment extends Fragment {
         Bitmap bitmap = ImagePicker.getImageFromResult(getActivity(), requestCode, resultCode, data);
         if (bitmap != null) {
             imageView.setImageBitmap(bitmap);
+        }
+        InputStream is = ImagePicker.getInputStreamFromResult(getActivity(), requestCode, resultCode, data);
+        if (is != null) {
+            textView.setText("Got input stream!");
+            try {
+                is.close();
+            } catch (IOException ex) {
+                // ignore
+            }
+        } else {
+            textView.setText("Failed to get input stream!");
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
