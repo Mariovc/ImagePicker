@@ -287,17 +287,17 @@ public final class ImagePicker {
             boundsOptions.inJustDecodeBounds = true;
             BitmapFactory.decodeFileDescriptor(fileDescriptor.getFileDescriptor(), null, boundsOptions);
 
-            // Get desired sample size
+            // Get desired sample size. Note that these must be powers-of-two.
             int[] sampleSizes = new int[]{8, 4, 2, 1};
-            int targetWidth = boundsOptions.outWidth / sampleSizes[0];
-            int targetHeight = boundsOptions.outHeight / sampleSizes[0];
+            int targetWidth;
+            int targetHeight;
 
             int i = 0;
-            while (i < sampleSizes.length && (targetWidth < minWidthQuality || targetHeight < minHeightQuality)) {
-                ++i;
+            do {
                 targetWidth = boundsOptions.outWidth / sampleSizes[i];
                 targetHeight = boundsOptions.outHeight / sampleSizes[i];
-            }
+                i++;
+            } while (i < sampleSizes.length && (targetWidth < minWidthQuality || targetHeight < minHeightQuality));
 
             // Decode bitmap at desired size
             BitmapFactory.Options decodeOptions = new BitmapFactory.Options();
