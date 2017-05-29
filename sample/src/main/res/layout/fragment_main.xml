@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2016 Mario Velasco Casquero
+  ~ Copyright 2017 Mario Velasco Casquero
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -22,12 +22,12 @@
     android:padding="@dimen/activity_default_padding"
     android:orientation="vertical"
     android:gravity="center"
-    tools:context=".MainActivity">
+    tools:context=".MainActivityWithFragment">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/pick_image_message"
+        android:text="Test"
         android:layout_margin="@dimen/picker_text_margin"/>
 
     <ImageView
@@ -35,9 +35,8 @@
         android:layout_width="300dp"
         android:layout_height="0dp"
         android:src="@android:drawable/ic_menu_gallery"
-        android:layout_weight="1"
-        android:onClick="onPickImage"/>
-
+        android:layout_weight="1"/>
+    
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

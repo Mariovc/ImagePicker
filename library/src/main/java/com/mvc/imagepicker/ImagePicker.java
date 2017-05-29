@@ -34,8 +34,10 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -217,11 +219,53 @@ public final class ImagePicker {
             }
             Log.i(TAG, "selectedImage: " + selectedImage);
 
-            bm = getImageResized(context, selectedImage);
+            bm = decodeBitmap(context, selectedImage);
             int rotation = ImageRotator.getRotation(context, selectedImage, isCamera);
             bm = ImageRotator.rotate(bm, rotation);
         }
         return bm;
+    }
+
+    /**
+     * Called after launching the picker with the same values of Activity.getImageFromResult
+     * in order to resolve the result and get the input stream for the image.
+     *
+     * @param context             context.
+     * @param requestCode         used to identify the pick image action.
+     * @param resultCode          -1 means the result is OK.
+     * @param imageReturnedIntent returned intent where is the image data.
+     * @return stream.
+     */
+    public static InputStream getInputStreamFromResult(Context context, int requestCode, int resultCode,
+                                                       Intent imageReturnedIntent) {
+        Log.i(TAG, "getFileFromResult() called with: " + "resultCode = [" + resultCode + "]");
+        if (resultCode == Activity.RESULT_OK && requestCode == PICK_IMAGE_REQUEST_CODE) {
+            File imageFile = getTemporalFile(context);
+            Uri selectedImage;
+            boolean isCamera = (imageReturnedIntent == null
+                || imageReturnedIntent.getData() == null
+                || imageReturnedIntent.getData().toString().contains(imageFile.toString()));
+            if (isCamera) {     /** CAMERA **/
+                selectedImage = Uri.fromFile(imageFile);
+            } else {            /** ALBUM **/
+                selectedImage = imageReturnedIntent.getData();
+            }
+            Log.i(TAG, "selectedImage: " + selectedImage);
+
+            try {
+                if (isCamera) {
+                    // We can just open the temporary file stream and return it
+                    return new FileInputStream(imageFile);
+                } else {
+                    // Otherwise use the ContentResolver
+                    return context.getContentResolver().openInputStream(selectedImage);
+                }
+            } catch (FileNotFoundException ex) {
+                Log.e(TAG, "Could not open input stream for: " + selectedImage);
+                return null;
+            }
+        }
+        return null;
     }
 
     private static File getTemporalFile(Context context) {
@@ -229,36 +273,40 @@ public final class ImagePicker {
     }
 
     /**
-     * Resize to avoid using too much memory loading big images (e.g.: 2560*1920)
-     **/
-    private static Bitmap getImageResized(Context context, Uri selectedImage) {
-        Bitmap bm;
-        int[] sampleSizes = new int[]{5, 3, 2, 1};
-        int i = 0;
-        do {
-            bm = decodeBitmap(context, selectedImage, sampleSizes[i]);
-            i++;
-        } while (bm != null
-                && (bm.getWidth() < minWidthQuality || bm.getHeight() < minHeightQuality)
-                && i < sampleSizes.length);
-        Log.i(TAG, "Final bitmap width = " + (bm != null ? bm.getWidth() : "No final bitmap"));
-        return bm;
-    }
-
-    private static Bitmap decodeBitmap(Context context, Uri theUri, int sampleSize) {
-        Bitmap actuallyUsableBitmap = null;
+     * Loads a bitmap and avoids using too much memory loading big images (e.g.: 2560*1920)
+     */
+    private static Bitmap decodeBitmap(Context context, Uri theUri) {
+        Bitmap outputBitmap = null;
         AssetFileDescriptor fileDescriptor = null;
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = sampleSize;
 
         try {
             fileDescriptor = context.getContentResolver().openAssetFileDescriptor(theUri, "r");
-            actuallyUsableBitmap = BitmapFactory
-                    .decodeFileDescriptor(fileDescriptor.getFileDescriptor(), null, options);
-            if (actuallyUsableBitmap != null) {
-                Log.i(TAG, "Trying sample size " + options.inSampleSize + "\t\t"
-                        + "Bitmap width: " + actuallyUsableBitmap.getWidth()
-                        + "\theight: " + actuallyUsableBitmap.getHeight());
+
+            // Get size of bitmap file
+            BitmapFactory.Options boundsOptions = new BitmapFactory.Options();
+            boundsOptions.inJustDecodeBounds = true;
+            BitmapFactory.decodeFileDescriptor(fileDescriptor.getFileDescriptor(), null, boundsOptions);
+
+            // Get desired sample size. Note that these must be powers-of-two.
+            int[] sampleSizes = new int[]{8, 4, 2, 1};
+            int targetWidth;
+            int targetHeight;
+
+            int i = 0;
+            do {
+                targetWidth = boundsOptions.outWidth / sampleSizes[i];
+                targetHeight = boundsOptions.outHeight / sampleSizes[i];
+                i++;
+            } while (i < sampleSizes.length && (targetWidth < minWidthQuality || targetHeight < minHeightQuality));
+
+            // Decode bitmap at desired size
+            BitmapFactory.Options decodeOptions = new BitmapFactory.Options();
+            decodeOptions.inSampleSize = sampleSizes[i];
+            outputBitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor.getFileDescriptor(), null, decodeOptions);
+            if (outputBitmap != null) {
+                Log.i(TAG, "Loaded image with sample size " + decodeOptions.inSampleSize + "\t\t"
+                    + "Bitmap width: " + outputBitmap.getWidth()
+                    + "\theight: " + outputBitmap.getHeight());
             }
             fileDescriptor.close();
         } catch (FileNotFoundException e) {
@@ -267,7 +315,7 @@ public final class ImagePicker {
             e.printStackTrace();
         }
 
-        return actuallyUsableBitmap;
+        return outputBitmap;
     }
 
 
