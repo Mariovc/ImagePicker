@@ -16,6 +16,7 @@
 
 apply plugin: 'com.android.library'
 apply plugin: 'checkstyle'
+apply from: "$project.rootDir/script-git-version.gradle"
 
 preBuild.dependsOn('checkstyle')
 assemble.dependsOn('lint')
@@ -31,8 +32,8 @@ android {
     defaultConfig {
         minSdkVersion config.minSdk
         targetSdkVersion config.targetSdk
-        versionCode config.version_code
-        versionName config.version_name
+        versionCode gitVersionCode
+        versionName gitVersionName
     }
 
     buildTypes {

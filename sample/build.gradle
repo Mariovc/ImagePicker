@@ -16,6 +16,7 @@
 
 apply plugin: 'com.android.application'
 apply plugin: 'checkstyle'
+apply from: "$project.rootDir/script-git-version.gradle"
 
 preBuild.dependsOn('checkstyle')
 assemble.dependsOn('lint')
@@ -32,11 +33,18 @@ android {
         applicationId config.packageName
         minSdkVersion config.minSdk
         targetSdkVersion config.targetSdk
-        versionCode config.version_code
-        versionName config.version_name
+        versionCode gitVersionCode
+        versionName gitVersionName
     }
 
     buildTypes {
+        debug {
+            applicationVariants.all { variant ->
+                if (variant.buildType.name == 'debug') {
+                    variant.mergedFlavor.versionName = gitVersionNameFull;
+                }
+            }
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
