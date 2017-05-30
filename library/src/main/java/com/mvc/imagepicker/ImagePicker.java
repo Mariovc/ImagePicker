@@ -27,10 +27,12 @@ import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 
 import java.io.File;
@@ -129,7 +131,9 @@ public final class ImagePicker {
         if (!appManifestContainsPermission(context, Manifest.permission.CAMERA) || hasCameraAccess(context)) {
             Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             takePhotoIntent.putExtra("return-data", true);
-            takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(getTemporalFile(context)));
+            Uri contentUri = getUriForFile(context, getTemporalFile(context));
+            takePhotoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, contentUri);
             intentList = addIntentsToList(context, intentList, takePhotoIntent);
         }
 
@@ -158,7 +162,8 @@ public final class ImagePicker {
 
     /**
      * Checks if the current context has permission to access the camera.
-     * @param context             context.
+     *
+     * @param context context.
      */
     private static boolean hasCameraAccess(Context context) {
         return ContextCompat.checkSelfPermission(context,
@@ -167,7 +172,8 @@ public final class ImagePicker {
 
     /**
      * Checks if the androidmanifest.xml contains the given permission.
-     * @param context             context.
+     *
+     * @param context context.
      * @return Boolean, indicating if the permission is present.
      */
     private static boolean appManifestContainsPermission(Context context, String permission) {
@@ -213,7 +219,7 @@ public final class ImagePicker {
                     || imageReturnedIntent.getData() == null
                     || imageReturnedIntent.getData().toString().contains(imageFile.toString()));
             if (isCamera) {     /** CAMERA **/
-                selectedImage = Uri.fromFile(imageFile);
+                selectedImage = getUriForFile(context, imageFile);
             } else {            /** ALBUM **/
                 selectedImage = imageReturnedIntent.getData();
             }
@@ -243,10 +249,10 @@ public final class ImagePicker {
             File imageFile = getTemporalFile(context);
             Uri selectedImage;
             boolean isCamera = (imageReturnedIntent == null
-                || imageReturnedIntent.getData() == null
-                || imageReturnedIntent.getData().toString().contains(imageFile.toString()));
+                    || imageReturnedIntent.getData() == null
+                    || imageReturnedIntent.getData().toString().contains(imageFile.toString()));
             if (isCamera) {     /** CAMERA **/
-                selectedImage = Uri.fromFile(imageFile);
+                selectedImage = getUriForFile(context, imageFile);
             } else {            /** ALBUM **/
                 selectedImage = imageReturnedIntent.getData();
             }
@@ -297,7 +303,8 @@ public final class ImagePicker {
                 targetWidth = boundsOptions.outWidth / sampleSizes[i];
                 targetHeight = boundsOptions.outHeight / sampleSizes[i];
                 i++;
-            } while (i < sampleSizes.length && (targetWidth < minWidthQuality || targetHeight < minHeightQuality));
+            }
+            while (i < sampleSizes.length && (targetWidth < minWidthQuality || targetHeight < minHeightQuality));
 
             // Decode bitmap at desired size
             BitmapFactory.Options decodeOptions = new BitmapFactory.Options();
@@ -305,8 +312,8 @@ public final class ImagePicker {
             outputBitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor.getFileDescriptor(), null, decodeOptions);
             if (outputBitmap != null) {
                 Log.i(TAG, "Loaded image with sample size " + decodeOptions.inSampleSize + "\t\t"
-                    + "Bitmap width: " + outputBitmap.getWidth()
-                    + "\theight: " + outputBitmap.getHeight());
+                        + "Bitmap width: " + outputBitmap.getWidth()
+                        + "\theight: " + outputBitmap.getHeight());
             }
             fileDescriptor.close();
         } catch (FileNotFoundException e) {
@@ -326,6 +333,28 @@ public final class ImagePicker {
     public static void setMinQuality(int minWidthQuality, int minHeightQuality) {
         ImagePicker.minWidthQuality = minWidthQuality;
         ImagePicker.minHeightQuality = minHeightQuality;
+    }
+
+    /*
+    Uri helper for Deprecated Url methods
+    https://medium.com/@ali.muzaffar/what-is-android-os-fileuriexposedexception-
+    and-what-you-can-do-about-it-70b9eb17c6d0
+     */
+
+    private static Uri getUriForFile(Context mContext, File file) {
+        Uri contentUri = null;
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                contentUri = FileProvider.getUriForFile(mContext,
+                        mContext.getPackageName() + ".fileProvider", file);
+
+            } else {
+                contentUri = Uri.fromFile(file);
+            }
+        } catch (Exception e) {
+
+        }
+        return contentUri;
     }
 }
 
