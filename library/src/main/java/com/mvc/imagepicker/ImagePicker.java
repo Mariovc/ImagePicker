@@ -289,19 +289,20 @@ public final class ImagePicker {
 
             // Get desired sample size. Note that these must be powers-of-two.
             int[] sampleSizes = new int[]{8, 4, 2, 1};
-            int targetWidth;
-            int targetHeight;
+            int selectedSampleSize = 1; // 1 by default (original image)
 
-            int i = 0;
-            do {
-                targetWidth = boundsOptions.outWidth / sampleSizes[i];
-                targetHeight = boundsOptions.outHeight / sampleSizes[i];
-                i++;
-            } while (i < sampleSizes.length && (targetWidth < minWidthQuality || targetHeight < minHeightQuality));
+            for (int sampleSize : sampleSizes) {
+                selectedSampleSize = sampleSize;
+                int targetWidth = boundsOptions.outWidth / sampleSize;
+                int targetHeight = boundsOptions.outHeight / sampleSize;
+                if (targetWidth >= minWidthQuality && targetHeight >= minHeightQuality) {
+                    break;
+                }
+            }
 
             // Decode bitmap at desired size
             BitmapFactory.Options decodeOptions = new BitmapFactory.Options();
-            decodeOptions.inSampleSize = sampleSizes[i];
+            decodeOptions.inSampleSize = selectedSampleSize;
             outputBitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor.getFileDescriptor(), null, decodeOptions);
             if (outputBitmap != null) {
                 Log.i(TAG, "Loaded image with sample size " + decodeOptions.inSampleSize + "\t\t"
