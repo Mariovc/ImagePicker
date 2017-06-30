@@ -62,11 +62,13 @@ android {
             }
         }
     }
+    buildToolsVersion '25.0.0'
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
+    compile 'com.squareup.picasso:picasso:2.5.2'
     compile "com.android.support:appcompat-v7:${libs.supportVersion}"
     compile project(':library')
 }

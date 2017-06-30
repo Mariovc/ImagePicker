@@ -29,6 +29,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -49,7 +50,8 @@ import java.util.List;
  */
 public final class ImagePicker {
 
-    public static final int PICK_IMAGE_REQUEST_CODE = 234; // the number doesn't matter
+    private static final int DEFAULT_REQUEST_CODE = 234;
+
     private static final int DEFAULT_MIN_WIDTH_QUALITY = 400;        // min pixels
     private static final int DEFAULT_MIN_HEIGHT_QUALITY = 400;        // min pixels
     private static final String TAG = ImagePicker.class.getSimpleName();
@@ -58,29 +60,71 @@ public final class ImagePicker {
     private static int minWidthQuality = DEFAULT_MIN_WIDTH_QUALITY;
     private static int minHeightQuality = DEFAULT_MIN_HEIGHT_QUALITY;
 
+    private static String mChooserTitle;
+    private static int mPickImageRequestCode = DEFAULT_REQUEST_CODE;
+    private static boolean mGalleryOnly = false;
+
     private ImagePicker() {
         // not called
     }
 
     /**
-     * Launch a dialog to pick an image from camera/gallery apps.
+     * Launch a dialog to pick an image from camera/gallery apps with custom request code.
+     *
+     * @param activity which will launch the dialog.
+     * @param requestCode request code that will be returned in result.
+     */
+    public static void pickImage(Activity activity, int requestCode) {
+        pickImage(activity, activity.getString(R.string.pick_image_intent_text), requestCode, false);
+    }
+
+    /**
+     * Launch a dialog to pick an image from camera/gallery apps with custom request code.
      *
      * @param activity which will launch the dialog.
      */
     public static void pickImage(Activity activity) {
-        String chooserTitle = activity.getString(R.string.pick_image_intent_text);
-        pickImage(activity, chooserTitle);
+        pickImage(activity, activity.getString(R.string.pick_image_intent_text), DEFAULT_REQUEST_CODE, false);
     }
 
     /**
-     * Launch a dialog to pick an image from camera/gallery apps.
+     * Launch a dialog to pick an image from camera/gallery apps with custom request code.
      *
-     * @param fragment which will launch the dialog and will get the result in
-     *                 onActivityResult()
+     * @param fragment which will launch the dialog.
+     * @param requestCode request code that will be returned in result.
+     */
+    public static void pickImage(Fragment fragment, int requestCode) {
+        pickImage(fragment, fragment.getString(R.string.pick_image_intent_text), requestCode, false);
+    }
+
+    /**
+     * Launch a dialog to pick an image from camera/gallery apps with custom request code.
+     *
+     * @param fragment which will launch the dialog.
      */
     public static void pickImage(Fragment fragment) {
-        String chooserTitle = fragment.getString(R.string.pick_image_intent_text);
-        pickImage(fragment, chooserTitle);
+        pickImage(fragment, fragment.getString(R.string.pick_image_intent_text), DEFAULT_REQUEST_CODE, false);
+    }
+
+    /**
+     * Launch a dialog to pick an image from gallery apps only with custom request code.
+     *
+     * @param activity which will launch the dialog.
+     * @param requestCode request code that will be returned in result.
+     */
+    public static void pickImageGalleryOnly(Activity activity, int requestCode) {
+        pickImage(activity, activity.getString(R.string.pick_image_intent_text), requestCode, true);
+
+    }
+
+    /**
+     * Launch a dialog to pick an image from gallery apps only with custom request code.
+     *
+     * @param fragment which will launch the dialog.
+     * @param requestCode request code that will be returned in result.
+     */
+    public static void pickImageGalleryOnly(Fragment fragment, int requestCode) {
+        pickImage(fragment, fragment.getString(R.string.pick_image_intent_text), requestCode, true);
     }
 
     /**
@@ -90,8 +134,7 @@ public final class ImagePicker {
      * @param chooserTitle will appear on the picker dialog.
      */
     public static void pickImage(Activity activity, String chooserTitle) {
-        Intent chooseImageIntent = getPickImageIntent(activity, chooserTitle);
-        activity.startActivityForResult(chooseImageIntent, PICK_IMAGE_REQUEST_CODE);
+        pickImage(activity, chooserTitle, DEFAULT_REQUEST_CODE, false);
     }
 
     /**
@@ -102,8 +145,48 @@ public final class ImagePicker {
      * @param chooserTitle will appear on the picker dialog.
      */
     public static void pickImage(Fragment fragment, String chooserTitle) {
-        Intent chooseImageIntent = getPickImageIntent(fragment.getContext(), chooserTitle);
-        fragment.startActivityForResult(chooseImageIntent, PICK_IMAGE_REQUEST_CODE);
+        pickImage(fragment, chooserTitle, DEFAULT_REQUEST_CODE, false);
+    }
+
+    /**
+     * Launch a dialog to pick an image from camera/gallery apps.
+     *
+     * @param fragment     which will launch the dialog and will get the result in
+     *                     onActivityResult()
+     * @param chooserTitle will appear on the picker dialog.
+     * @param requestCode request code that will be returned in result.
+     */
+    public static void pickImage(Fragment fragment, String chooserTitle,
+                                 int requestCode, boolean galleryOnly) {
+        mGalleryOnly = galleryOnly;
+        mPickImageRequestCode = requestCode;
+        mChooserTitle = chooserTitle;
+        startChooser(fragment);
+    }
+
+    /**
+     * Launch a dialog to pick an image from camera/gallery apps.
+     *
+     * @param activity     which will launch the dialog and will get the result in
+     *                     onActivityResult()
+     * @param chooserTitle will appear on the picker dialog.
+     */
+    public static void pickImage(Activity activity, String chooserTitle,
+                                 int requestCode, boolean galleryOnly) {
+        mGalleryOnly = galleryOnly;
+        mPickImageRequestCode = requestCode;
+        mChooserTitle = chooserTitle;
+        startChooser(activity);
+    }
+
+    private static void startChooser(Fragment fragmentContext) {
+        Intent chooseImageIntent = getPickImageIntent(fragmentContext.getContext(), mChooserTitle);
+        fragmentContext.startActivityForResult(chooseImageIntent, mPickImageRequestCode);
+    }
+
+    private static void startChooser(Activity activityContext) {
+        Intent chooseImageIntent = getPickImageIntent(activityContext, mChooserTitle);
+        activityContext.startActivityForResult(chooseImageIntent, mPickImageRequestCode);
     }
 
     /**
@@ -121,16 +204,20 @@ public final class ImagePicker {
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intentList = addIntentsToList(context, intentList, pickIntent);
 
-        // Camera action will fail if the app does not have permission, check before adding intent.
-        // We only need to add the camera intent if the app does not use the CAMERA permission
-        // in the androidmanifest.xml
-        // Or if the user has granted access to the camera.
-        // See https://developer.android.com/reference/android/provider/MediaStore.html#ACTION_IMAGE_CAPTURE
-        if (!appManifestContainsPermission(context, Manifest.permission.CAMERA) || hasCameraAccess(context)) {
-            Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            takePhotoIntent.putExtra("return-data", true);
-            takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(getTemporalFile(context)));
-            intentList = addIntentsToList(context, intentList, takePhotoIntent);
+        // Check is we want gallery apps only
+        if (!mGalleryOnly) {
+            // Camera action will fail if the app does not have permission, check before adding intent.
+            // We only need to add the camera intent if the app does not use the CAMERA permission
+            // in the androidmanifest.xml
+            // Or if the user has granted access to the camera.
+            // See https://developer.android.com/reference/android/provider/MediaStore.html#ACTION_IMAGE_CAPTURE
+            if (!appManifestContainsPermission(context, Manifest.permission.CAMERA) || hasCameraAccess(context)) {
+                Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                takePhotoIntent.putExtra("return-data", true);
+                takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                        Uri.fromFile(ImageUtils.getTemporalFile(context, String.valueOf(mPickImageRequestCode))));
+                intentList = addIntentsToList(context, intentList, takePhotoIntent);
+            }
         }
 
         if (intentList.size() > 0) {
@@ -202,12 +289,13 @@ public final class ImagePicker {
      * @param imageReturnedIntent returned intent where is the image data.
      * @return image.
      */
+    @Nullable
     public static Bitmap getImageFromResult(Context context, int requestCode, int resultCode,
                                             Intent imageReturnedIntent) {
         Log.i(TAG, "getImageFromResult() called with: " + "resultCode = [" + resultCode + "]");
         Bitmap bm = null;
-        if (resultCode == Activity.RESULT_OK && requestCode == PICK_IMAGE_REQUEST_CODE) {
-            File imageFile = getTemporalFile(context);
+        if (resultCode == Activity.RESULT_OK && requestCode == mPickImageRequestCode) {
+            File imageFile = ImageUtils.getTemporalFile(context, String.valueOf(mPickImageRequestCode));
             Uri selectedImage;
             boolean isCamera = (imageReturnedIntent == null
                     || imageReturnedIntent.getData() == null
@@ -228,6 +316,66 @@ public final class ImagePicker {
 
     /**
      * Called after launching the picker with the same values of Activity.getImageFromResult
+     * in order to resolve the result and get the image path.
+     *
+     * @param context             context.
+     * @param requestCode         used to identify the pick image action.
+     * @param resultCode          -1 means the result is OK.
+     * @param imageReturnedIntent returned intent where is the image data.
+     * @return path to the saved image.
+     */
+    @Nullable
+    public static String getImagePathFromResult(Context context, int requestCode, int resultCode,
+                                                Intent imageReturnedIntent) {
+        Log.i(TAG, "getImagePathFromResult() called with: " + "resultCode = [" + resultCode + "]");
+        Uri selectedImage = null;
+        if (resultCode == Activity.RESULT_OK && requestCode == mPickImageRequestCode) {
+            File imageFile = ImageUtils.getTemporalFile(context, String.valueOf(mPickImageRequestCode));
+            boolean isCamera = (imageReturnedIntent == null
+                    || imageReturnedIntent.getData() == null
+                    || imageReturnedIntent.getData().toString().contains(imageFile.toString()));
+            if (isCamera) {
+                return imageFile.getAbsolutePath();
+            } else {
+                selectedImage = imageReturnedIntent.getData();
+            }
+            Log.i(TAG, "selectedImage: " + selectedImage);
+        }
+        if (selectedImage == null) {
+            return null;
+        }
+        return getFilePathFromUri(context, selectedImage);
+    }
+
+    /**
+     * Get stream, save the picture to the temp file and return path.
+     *
+     * @param context context
+     * @param uri uri of the incoming file
+     * @return path to the saved image.
+     */
+    private static String getFilePathFromUri(Context context, Uri uri) {
+        InputStream is = null;
+        if (uri.getAuthority() != null) {
+            try {
+                is = context.getContentResolver().openInputStream(uri);
+                Bitmap bmp = BitmapFactory.decodeStream(is);
+                return ImageUtils.savePicture(context, bmp, String.valueOf(uri.getPath().hashCode()));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Called after launching the picker with the same values of Activity.getImageFromResult
      * in order to resolve the result and get the input stream for the image.
      *
      * @param context             context.
@@ -239,8 +387,8 @@ public final class ImagePicker {
     public static InputStream getInputStreamFromResult(Context context, int requestCode, int resultCode,
                                                        Intent imageReturnedIntent) {
         Log.i(TAG, "getFileFromResult() called with: " + "resultCode = [" + resultCode + "]");
-        if (resultCode == Activity.RESULT_OK && requestCode == PICK_IMAGE_REQUEST_CODE) {
-            File imageFile = getTemporalFile(context);
+        if (resultCode == Activity.RESULT_OK && requestCode == mPickImageRequestCode) {
+            File imageFile = ImageUtils.getTemporalFile(context, String.valueOf(mPickImageRequestCode));
             Uri selectedImage;
             boolean isCamera = (imageReturnedIntent == null
                 || imageReturnedIntent.getData() == null
@@ -266,10 +414,6 @@ public final class ImagePicker {
             }
         }
         return null;
-    }
-
-    private static File getTemporalFile(Context context) {
-        return new File(context.getExternalCacheDir(), TEMP_IMAGE_NAME);
     }
 
     /**
