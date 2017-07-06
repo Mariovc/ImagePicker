@@ -20,8 +20,8 @@ ext {
     configuration = [
             app_name            : "ImagePicker",
             packageName         : "com.mvc.imagepicker",
-            compileVersion      : 24,
-            buildToolsVersion   : "23.0.3",
+            compileVersion      : 25,
+            buildToolsVersion   : "25.0.3",
             minSdk              : 14,
             targetSdk           : 24
     ]
@@ -36,7 +36,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.3'
+        classpath 'com.android.tools.build:gradle:2.3.3'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
