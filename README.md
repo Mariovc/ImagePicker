@@ -28,6 +28,8 @@ Usage
 Add the following code to your *Activity*:
 
 ```java
+import com.mvc.imagepicker.ImagePicker;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         ...
