@@ -17,8 +17,10 @@
 package com.mvc.imagepicker.sample;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -28,7 +30,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mvc.imagepicker.ImagePicker;
+import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -39,7 +43,14 @@ import java.io.InputStream;
 
 public class MainFragment extends Fragment {
 
-    private ImageView imageView;
+    public static final String CACHED_IMG_KEY = "img_key";
+
+    public static final int SECOND_PIC_REQ = 1313;
+    public static final int GALLERY_ONLY_REQ = 1212;
+
+    private ImageView imageView1;
+    private ImageView imageView2;
+    private ImageView imageViewGalleryOnly;
     private TextView textView;
 
 
@@ -53,12 +64,32 @@ public class MainFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_main, container, false);
-        imageView = (ImageView) v.findViewById(R.id.image_view);
+        imageView1 = (ImageView) v.findViewById(R.id.image_view_1);
+        imageView2 = (ImageView) v.findViewById(R.id.image_view_2);
+        imageViewGalleryOnly = (ImageView) v.findViewById(R.id.image_view_gallery_only);
         textView = (TextView) v.findViewById(R.id.image_stream_indicator);
-        imageView.setOnClickListener(new View.OnClickListener() {
+        imageView1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ImagePicker.pickImage(MainFragment.this, "Select your image:");
+            }
+        });
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String path = prefs.getString(CACHED_IMG_KEY, "");
+        File cached = new File(path);
+        if (cached.exists()) {
+            Picasso.with(getActivity()).load(cached).into(imageView2);
+        }
+        imageView2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImagePicker.pickImage(MainFragment.this, SECOND_PIC_REQ);
+            }
+        });
+        imageViewGalleryOnly.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImagePicker.pickImageGalleryOnly(MainFragment.this, GALLERY_ONLY_REQ);
             }
         });
         return v;
@@ -66,9 +97,28 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Bitmap bitmap = ImagePicker.getImageFromResult(getActivity(), requestCode, resultCode, data);
-        if (bitmap != null) {
-            imageView.setImageBitmap(bitmap);
+
+        switch (requestCode) {
+            case SECOND_PIC_REQ:
+                String imagePathFromResult = ImagePicker.getImagePathFromResult(getActivity(),
+                        requestCode, resultCode, data);
+                if (imagePathFromResult != null) {
+                    String path = "file:///" + imagePathFromResult;
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                    prefs.edit().putString(CACHED_IMG_KEY, imagePathFromResult).apply();
+                    Picasso.with(getActivity()).load(path).into(imageView2);
+                }
+                break;
+            case GALLERY_ONLY_REQ:
+                String pathFromGallery = "file:///" + ImagePicker.getImagePathFromResult(getActivity(), requestCode,
+                        resultCode, data);
+                Picasso.with(getActivity()).load(pathFromGallery).into(imageViewGalleryOnly);
+                break;
+            default:
+                Bitmap bitmap = ImagePicker.getImageFromResult(getActivity(), requestCode, resultCode, data);
+                if (bitmap != null) {
+                    imageView1.setImageBitmap(bitmap);
+                }
         }
         InputStream is = ImagePicker.getInputStreamFromResult(getActivity(), requestCode, resultCode, data);
         if (is != null) {
