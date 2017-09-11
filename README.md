@@ -89,6 +89,7 @@ Developed By
 ------------
 
 * Mario Velasco Casquero - <m3ario@gmail.com>
+* Nidhin Prathap
 
 <a href="https://twitter.com/MVelascoC">
   <img alt="Follow me on Twitter" src="./art/twitter.png" />
