@@ -204,7 +204,7 @@ public final class ImagePicker {
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intentList = addIntentsToList(context, intentList, pickIntent);
 
-        // Check is we want gallery apps only
+        // Check if we want gallery apps only
         if (!mGalleryOnly) {
             // Camera action will fail if the app does not have permission, check before adding intent.
             // We only need to add the camera intent if the app does not use the CAMERA permission
