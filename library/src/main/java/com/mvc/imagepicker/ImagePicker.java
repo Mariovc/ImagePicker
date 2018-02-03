@@ -182,7 +182,6 @@ public final class ImagePicker {
 
     private static void startChooser(Fragment fragmentContext) {
         Intent chooseImageIntent = getPickImageIntent(fragmentContext.getContext(), mChooserTitle);
-        System.out.println(" comes herte" + chooseImageIntent);
         fragmentContext.startActivityForResult(chooseImageIntent, mPickImageRequestCode);
     }
 
@@ -216,7 +215,7 @@ public final class ImagePicker {
             if (!appManifestContainsPermission(context, Manifest.permission.CAMERA) || hasCameraAccess(context)) {
                 Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 takePhotoIntent.putExtra("return-data", true);
-                
+
                 takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT,
                         FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider",
                                 ImageUtils.getTemporalFile(context, String.valueOf(mPickImageRequestCode))));
