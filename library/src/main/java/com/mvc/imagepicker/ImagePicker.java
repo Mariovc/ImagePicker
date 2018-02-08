@@ -72,7 +72,7 @@ public final class ImagePicker {
     /**
      * Launch a dialog to pick an image from camera/gallery apps with custom request code.
      *
-     * @param activity    which will launch the dialog.
+     * @param activity which will launch the dialog.
      * @param requestCode request code that will be returned in result.
      */
     public static void pickImage(Activity activity, int requestCode) {
@@ -91,7 +91,7 @@ public final class ImagePicker {
     /**
      * Launch a dialog to pick an image from camera/gallery apps with custom request code.
      *
-     * @param fragment    which will launch the dialog.
+     * @param fragment which will launch the dialog.
      * @param requestCode request code that will be returned in result.
      */
     public static void pickImage(Fragment fragment, int requestCode) {
@@ -110,7 +110,7 @@ public final class ImagePicker {
     /**
      * Launch a dialog to pick an image from gallery apps only with custom request code.
      *
-     * @param activity    which will launch the dialog.
+     * @param activity which will launch the dialog.
      * @param requestCode request code that will be returned in result.
      */
     public static void pickImageGalleryOnly(Activity activity, int requestCode) {
@@ -121,7 +121,7 @@ public final class ImagePicker {
     /**
      * Launch a dialog to pick an image from gallery apps only with custom request code.
      *
-     * @param fragment    which will launch the dialog.
+     * @param fragment which will launch the dialog.
      * @param requestCode request code that will be returned in result.
      */
     public static void pickImageGalleryOnly(Fragment fragment, int requestCode) {
@@ -155,7 +155,7 @@ public final class ImagePicker {
      * @param fragment     which will launch the dialog and will get the result in
      *                     onActivityResult()
      * @param chooserTitle will appear on the picker dialog.
-     * @param requestCode  request code that will be returned in result.
+     * @param requestCode request code that will be returned in result.
      */
     public static void pickImage(Fragment fragment, String chooserTitle,
                                  int requestCode, boolean galleryOnly) {
@@ -215,7 +215,6 @@ public final class ImagePicker {
             if (!appManifestContainsPermission(context, Manifest.permission.CAMERA) || hasCameraAccess(context)) {
                 Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 takePhotoIntent.putExtra("return-data", true);
-
                 takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT,
                         FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider",
                                 ImageUtils.getTemporalFile(context, String.valueOf(mPickImageRequestCode))));
@@ -249,8 +248,7 @@ public final class ImagePicker {
 
     /**
      * Checks if the current context has permission to access the camera.
-     *
-     * @param context context.
+     * @param context             context.
      */
     private static boolean hasCameraAccess(Context context) {
         return ContextCompat.checkSelfPermission(context,
@@ -259,8 +257,7 @@ public final class ImagePicker {
 
     /**
      * Checks if the androidmanifest.xml contains the given permission.
-     *
-     * @param context context.
+     * @param context             context.
      * @return Boolean, indicating if the permission is present.
      */
     private static boolean appManifestContainsPermission(Context context, String permission) {
@@ -360,7 +357,7 @@ public final class ImagePicker {
      * Get stream, save the picture to the temp file and return path.
      *
      * @param context context
-     * @param uri     uri of the incoming file
+     * @param uri uri of the incoming file
      * @return path to the saved image.
      */
     private static String getFilePathFromUri(Context context, Uri uri) {
@@ -483,4 +480,3 @@ public final class ImagePicker {
         ImagePicker.minHeightQuality = minHeightQuality;
     }
 }
-
