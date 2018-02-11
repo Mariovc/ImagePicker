@@ -32,6 +32,7 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 
 import java.io.File;
@@ -215,7 +216,9 @@ public final class ImagePicker {
                 Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 takePhotoIntent.putExtra("return-data", true);
                 takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-                        Uri.fromFile(ImageUtils.getTemporalFile(context, String.valueOf(mPickImageRequestCode))));
+                        FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider",
+                                ImageUtils.getTemporalFile(context, String.valueOf(mPickImageRequestCode))));
+                //Uri.fromFile(ImageUtils.getTemporalFile(context, String.valueOf(mPickImageRequestCode))));
                 intentList = addIntentsToList(context, intentList, takePhotoIntent);
             }
         }
@@ -301,7 +304,10 @@ public final class ImagePicker {
                     || imageReturnedIntent.getData() == null
                     || imageReturnedIntent.getData().toString().contains(imageFile.toString()));
             if (isCamera) {     /** CAMERA **/
-                selectedImage = Uri.fromFile(imageFile);
+                //selectedImage = Uri.fromFile(imageFile);
+                selectedImage = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", imageFile);
+
+
             } else {            /** ALBUM **/
                 selectedImage = imageReturnedIntent.getData();
             }
@@ -391,10 +397,11 @@ public final class ImagePicker {
             File imageFile = ImageUtils.getTemporalFile(context, String.valueOf(mPickImageRequestCode));
             Uri selectedImage;
             boolean isCamera = (imageReturnedIntent == null
-                || imageReturnedIntent.getData() == null
-                || imageReturnedIntent.getData().toString().contains(imageFile.toString()));
+                    || imageReturnedIntent.getData() == null
+                    || imageReturnedIntent.getData().toString().contains(imageFile.toString()));
             if (isCamera) {     /** CAMERA **/
-                selectedImage = Uri.fromFile(imageFile);
+                //selectedImage = Uri.fromFile(imageFile);
+                selectedImage = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", imageFile);
             } else {            /** ALBUM **/
                 selectedImage = imageReturnedIntent.getData();
             }
@@ -450,8 +457,8 @@ public final class ImagePicker {
             outputBitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor.getFileDescriptor(), null, decodeOptions);
             if (outputBitmap != null) {
                 Log.i(TAG, "Loaded image with sample size " + decodeOptions.inSampleSize + "\t\t"
-                    + "Bitmap width: " + outputBitmap.getWidth()
-                    + "\theight: " + outputBitmap.getHeight());
+                        + "Bitmap width: " + outputBitmap.getWidth()
+                        + "\theight: " + outputBitmap.getHeight());
             }
             fileDescriptor.close();
         } catch (FileNotFoundException e) {
@@ -473,4 +480,3 @@ public final class ImagePicker {
         ImagePicker.minHeightQuality = minHeightQuality;
     }
 }
-
