@@ -305,7 +305,8 @@ public final class ImagePicker {
                     || imageReturnedIntent.getData().toString().contains(imageFile.toString()));
             if (isCamera) {     /** CAMERA **/
                 //selectedImage = Uri.fromFile(imageFile);
-                selectedImage = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", imageFile);
+                selectedImage = FileProvider.getUriForFile(context,
+                        BuildConfig.APPLICATION_ID + ".provider", imageFile);
 
 
             } else {            /** ALBUM **/
@@ -401,7 +402,8 @@ public final class ImagePicker {
                     || imageReturnedIntent.getData().toString().contains(imageFile.toString()));
             if (isCamera) {     /** CAMERA **/
                 //selectedImage = Uri.fromFile(imageFile);
-                selectedImage = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", imageFile);
+                selectedImage = FileProvider.getUriForFile(context,
+                        BuildConfig.APPLICATION_ID + ".provider", imageFile);
             } else {            /** ALBUM **/
                 selectedImage = imageReturnedIntent.getData();
             }
