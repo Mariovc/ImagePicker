@@ -24,7 +24,6 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import java.io.File;
 import java.io.InputStream;
 
 import android.media.ExifInterface;
@@ -67,13 +66,10 @@ public final class ImageRotator {
         int rotate = 0;
         try {
 
-            File file = new File(imageFile.toString());
-            context.getContentResolver().notifyChange(imageFile, null);
-
-            InputStream inputStream = context.getContentResolver().openInputStream(imageFile);
-
             ExifInterface exif = null;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                context.getContentResolver().notifyChange(imageFile, null);
+                InputStream inputStream = context.getContentResolver().openInputStream(imageFile);
                 exif = new ExifInterface(inputStream);
             } else {
                exif = new ExifInterface(imageFile.getPath());
