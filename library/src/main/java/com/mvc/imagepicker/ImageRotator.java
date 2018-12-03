@@ -20,10 +20,15 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
+
+import java.io.File;
+import java.io.InputStream;
+
+import android.media.ExifInterface;
+
 
 /**
  * Author: Mario Velasco Casquero
@@ -62,8 +67,17 @@ public final class ImageRotator {
         int rotate = 0;
         try {
 
+            File file = new File(imageFile.toString());
             context.getContentResolver().notifyChange(imageFile, null);
-            ExifInterface exif = new ExifInterface(imageFile.getPath());
+
+            InputStream inputStream = context.getContentResolver().openInputStream(imageFile);
+
+            ExifInterface exif = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                exif = new ExifInterface(inputStream);
+            } else {
+               exif = new ExifInterface(imageFile.getPath());
+            }
             int orientation = exif.getAttributeInt(
                     ExifInterface.TAG_ORIENTATION,
                     ExifInterface.ORIENTATION_NORMAL);
