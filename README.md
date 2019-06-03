@@ -1,4 +1,4 @@
-ImagePicker
+ImagePicker [Deprecated] (Use <a href="https://developer.android.com/training/camerax">Google API CameraX</a>)
 ===========
 
 <a href="https://android-arsenal.com/api?level=14">
