@@ -78,6 +78,33 @@ dependencies{
 
 where `x.x.x` corresponds to latest release version published in [ ![release](https://img.shields.io/github/release/Mariovc/ImagePicker.svg) ](https://github.com/Mariovc/ImagePicker/releases/latest)
 
+In order to display the `ImagePicker` and to make works correcly both gallery and camera you have add this `provider` section inside the `AndroidManifest.xml` file:
+```
+<application>
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            <!-- or android:name="androidx.core.content.FileProvider" if using androidx -->
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+        ...
+</application>
+```
+
+As you can see from the `android:resource="@xml/provider_paths"` line you also have to provide the `provider_paths.xml` file, that will contains these lines of code:
+```
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-path
+      name="external_files"
+      path="." />
+</paths>
+```
+
 
 Contributing
 --------------------------
